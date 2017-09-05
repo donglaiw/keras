@@ -13,7 +13,7 @@ Use Keras if you need a deep learning library that:
 - Supports both convolutional networks and recurrent networks, as well as combinations of the two.
 - Runs seamlessly on CPU and GPU.
 
-Read the documentation at [Keras.io](https://keras.io).
+Read the documentation at [Keras.io](http://keras.io).
 
 Keras is compatible with: __Python 2.7-3.5__.
 
@@ -37,7 +37,7 @@ Keras is compatible with: __Python 2.7-3.5__.
 
 ## Getting started: 30 seconds to Keras
 
-The core data structure of Keras is a __model__, a way to organize layers. The simplest type of model is the [`Sequential`](https://keras.io/getting-started/sequential-model-guide) model, a linear stack of layers. For more complex architectures, you should use the [Keras functional API](https://keras.io/getting-started/functional-api-guide), which allows to build arbitrary graphs of layers.
+The core data structure of Keras is a __model__, a way to organize layers. The simplest type of model is the [`Sequential`](http://keras.io/getting-started/sequential-model-guide) model, a linear stack of layers. For more complex architectures, you should use the [Keras functional API](http://keras.io/getting-started/functional-api-guide), which allows to build arbitrary graphs of layers.
 
 Here is the `Sequential` model:
 
@@ -101,8 +101,8 @@ Building a question answering system, an image classification model, a Neural Tu
 
 For a more in-depth tutorial about Keras, you can check out:
 
-- [Getting started with the Sequential model](https://keras.io/getting-started/sequential-model-guide)
-- [Getting started with the functional API](https://keras.io/getting-started/functional-api-guide)
+- [Getting started with the Sequential model](http://keras.io/getting-started/sequential-model-guide)
+- [Getting started with the functional API](http://keras.io/getting-started/functional-api-guide)
 
 In the [examples folder](https://github.com/fchollet/keras/tree/master/examples) of the repository, you will find more advanced models: question-answering with memory networks, text generation with stacked LSTMs, etc.
 
@@ -112,44 +112,37 @@ In the [examples folder](https://github.com/fchollet/keras/tree/master/examples)
 
 ## Installation
 
-Before installing Keras, please install one of its backend engines: TensorFlow, Theano, or CNTK. We recommend the TensorFlow backend.
+Keras uses the following dependencies:
 
-- [TensorFlow installation instructions](https://www.tensorflow.org/install/).
-- [Theano installation instructions](http://deeplearning.net/software/theano/install.html#install).
-- [CNTK installation instructions](https://docs.microsoft.com/en-us/cognitive-toolkit/setup-cntk-on-your-machine).
+- numpy, scipy
+- yaml
+- HDF5 and h5py (optional, required if you use model saving/loading functions)
+- Optional but recommended if you use CNNs: cuDNN.
 
-You may also consider installing the following **optional dependencies**:
 
-- cuDNN (recommended if you plan on running Keras on GPU).
-- HDF5 and h5py (required if you plan on saving Keras models to disk).
-- graphviz and pydot (used by [visualization utilities](https://keras.io/visualization/) to plot model graphs).
+*When using the TensorFlow backend:*
 
-Then, you can install Keras itself. There are two ways to install Keras:
+- TensorFlow
+    - [See installation instructions](https://www.tensorflow.org/install/).
 
-- **Install Keras from PyPI (recommended):**
+*When using the CNTK backend:*
 
+- CNTK
+    - [See installation instructions](https://docs.microsoft.com/en-us/cognitive-toolkit/setup-cntk-on-your-machine).
+
+*When using the Theano backend:*
+
+- Theano
+    - [See installation instructions](http://deeplearning.net/software/theano/install.html#install).
+
+To install Keras, `cd` to the Keras folder and run the install command:
+```sh
+sudo python setup.py install
+```
+
+You can also install Keras from PyPI:
 ```sh
 sudo pip install keras
-```
-
-If you are using a virtualenv, you may want to avoid using sudo:
-
-```sh
-pip install keras
-```
-
-- **Alternatively: install Keras from the Github source:**
-
-First, clone Keras using `git`:
-
-```sh
-git clone https://github.com/fchollet/keras.git
-```
-
- Then, `cd` to the Keras folder and run the install command:
-```sh
-cd keras
-sudo python setup.py install
 ```
 
 ------------------
@@ -157,7 +150,7 @@ sudo python setup.py install
 
 ## Switching from TensorFlow to CNTK or Theano
 
-By default, Keras will use TensorFlow as its tensor manipulation library. [Follow these instructions](https://keras.io/backend/) to configure the Keras backend.
+By default, Keras will use TensorFlow as its tensor manipulation library. [Follow these instructions](http://keras.io/backend/) to configure the Keras backend.
 
 ------------------
 

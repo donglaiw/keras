@@ -128,7 +128,7 @@ def Xception(include_top=True, weights='imagenet',
                                       default_size=299,
                                       min_size=71,
                                       data_format=K.image_data_format(),
-                                      require_flatten=False,
+                                      include_top=include_top,
                                       weights=weights)
 
     if input_tensor is None:

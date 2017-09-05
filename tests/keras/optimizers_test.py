@@ -117,7 +117,7 @@ def test_clipvalue():
 
 @keras_test
 @pytest.mark.skipif((K.backend() != 'tensorflow'),
-                    reason='Requires TensorFlow backend')
+                    reason='Requires tensorflow backend')
 def test_tfoptimizer():
     from keras import constraints
     from tensorflow import train

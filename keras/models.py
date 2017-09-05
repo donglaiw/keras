@@ -662,6 +662,12 @@ class Sequential(Model):
             self.build()
         return self.model.regularizers
 
+    @property
+    def constraints(self):
+        if not self.built:
+            self.build()
+        return self.model.constraints
+
     def get_weights(self):
         """Retrieves the weights of the model.
 

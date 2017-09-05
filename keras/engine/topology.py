@@ -405,7 +405,7 @@ class Layer(object):
             self._non_trainable_weights.append(weight)
         return weight
 
-    def assert_input_compatibility(self, inputs):
+    def assert_input_compatibility(self, inputs, num_groups=1,axis_group=1):
         """Checks compatibility between the layer and provided inputs.
 
         This checks that the tensor(s) `input`
@@ -483,8 +483,15 @@ class Layer(object):
             if spec.axes:
                 try:
                     x_shape = K.int_shape(x)
+
                 except TypeError:
                     x_shape = None
+                if len(x._keras_history)>1 and hasattr(x._keras_history[0],'num_groups'):
+                    # dw: 2017.08.25 add for group convolution
+                    x_shape = list(x_shape)
+                    x_shape[axis_group] = x_shape[axis_group] * x._keras_history[0].num_groups
+                    x_shape = tuple(x_shape)
+                #print(x_shape)
                 if x_shape is not None:
                     for axis, value in spec.axes.items():
                         if value is not None and x_shape[int(axis)] not in {value, None}:
@@ -555,7 +562,13 @@ class Layer(object):
             if not self.built:
                 # Raise exceptions in case the input is not compatible
                 # with the input_spec specified in the layer constructor.
-                self.assert_input_compatibility(inputs)
+                # dw: 2017.08.25
+                if hasattr(self,'data_format'):
+                    dw_axis=1 if self.data_format == 'channels_first' else 4
+                if hasattr(self,'num_groups'):
+                    self.assert_input_compatibility(inputs,self.num_groups,dw_axis)
+                else:
+                    self.assert_input_compatibility(inputs)
 
                 # Collect input shapes to build layer.
                 input_shapes = []
@@ -571,19 +584,35 @@ class Layer(object):
                                          'and thus cannot be built. '
                                          'You can build it manually via: '
                                          '`layer.build(batch_input_shape)`')
+                # dw: layer after group deconv
                 if len(input_shapes) == 1:
+                    if len(inputs._keras_history)>1 and hasattr(inputs._keras_history[0],'num_groups'):
+                        input_shapes[0] = list(input_shapes[0])
+                        input_shapes[0][dw_axis] = input_shapes[0][dw_axis]*inputs._keras_history[0].num_groups
+                        input_shapes[0] = tuple(input_shapes[0])
                     self.build(input_shapes[0])
                 else:
+                    if hasattr(inputs,'_keras_history') and hasattr(inputs._keras_history[0],'num_groups'):
+                        input_shapes = list(input_shapes)
+                        input_shapes[dw] = input_shapes[dw]*inputs._keras_history[0].num_groups
+                        input_shapes= tuple(input_shapes)
                     self.build(input_shapes)
                 self.built = True
 
+                #print(input_shapes)
                 # Load weights that were specified at layer instantiation.
                 if self._initial_weights is not None:
                     self.set_weights(self._initial_weights)
 
             # Raise exceptions in case the input is not compatible
             # with the input_spec set at build time.
-            self.assert_input_compatibility(inputs)
+            # dw: 2017.08.25
+            if hasattr(self,'num_groups'):
+                tmp_axis=1 if self.data_format == 'channels_first' else 4
+                self.assert_input_compatibility(inputs,self.num_groups,tmp_axis)
+            else:
+                self.assert_input_compatibility(inputs)
+
 
             # Handle mask propagation.
             previous_mask = _collect_previous_mask(inputs)
@@ -616,7 +645,7 @@ class Layer(object):
             else:
                 output = output_ls_copy
 
-            # Inferring the output shape is only relevant for Theano.
+            # Infering the output shape is only relevant for Theano.
             if all([s is not None for s in _to_list(input_shape)]):
                 output_shape = self.compute_output_shape(input_shape)
             else:

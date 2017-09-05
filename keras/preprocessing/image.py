@@ -333,7 +333,7 @@ def load_img(path, grayscale=False, target_size=None):
     return img
 
 
-def list_pictures(directory, ext='jpg|jpeg|bmp|png|ppm'):
+def list_pictures(directory, ext='jpg|jpeg|bmp|png'):
     return [os.path.join(root, f)
             for root, _, files in os.walk(directory) for f in files
             if re.match(r'([\w]+\.(?:' + ext + '))', f)]
@@ -908,7 +908,7 @@ class DirectoryIterator(Iterator):
             to use for random transformations and normalization.
         target_size: tuple of integers, dimensions to resize input images to.
         color_mode: One of `"rgb"`, `"grayscale"`. Color mode to read images.
-        classes: Optional list of strings, names of subdirectories
+        classes: Optional list of strings, names of sudirectories
             containing images from each class (e.g. `["dogs", "cats"]`).
             It will be computed automatically if not set.
         class_mode: Mode for yielding the targets:
@@ -971,7 +971,7 @@ class DirectoryIterator(Iterator):
         self.save_prefix = save_prefix
         self.save_format = save_format
 
-        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp', 'ppm'}
+        white_list_formats = {'png', 'jpg', 'jpeg', 'bmp'}
 
         # first, count the number of samples and classes
         self.samples = 0

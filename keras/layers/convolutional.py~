@@ -125,7 +125,6 @@ class _Conv(Layer):
             raise ValueError('The channel dimension of the inputs '
                              'should be defined. Found `None`.')
         input_dim = input_shape[channel_axis]
-
         kernel_shape = self.kernel_size + (input_dim, self.filters)
 
         self.kernel = self.add_weight(shape=kernel_shape,
@@ -962,7 +961,6 @@ class Conv3DNTranspose(Conv3D):
 
     def call(self, inputs):
         input_shape = K.shape(inputs)
-
         batch_size = input_shape[0]
         if self.data_format == 'channels_first':
             d_axis, h_axis, w_axis = 2, 3, 4
@@ -1195,7 +1193,9 @@ class Conv3DTranspose(Conv3D):
 
     def call(self, inputs):
         input_shape = K.shape(inputs)
-
+        print(inputs.shape)
+        if hasattr(inputs, 'num_groups'):
+        import pdb; pdb.set_trace()
         batch_size = input_shape[0]
         if self.data_format == 'channels_first':
             d_axis, h_axis, w_axis = 2, 3, 4

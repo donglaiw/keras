@@ -141,6 +141,14 @@ def test_model_methods():
     out = model.fit({'input_a': input_a_np, 'input_b': input_b_np},
                     [output_a_np, output_b_np],
                     epochs=1, batch_size=4, validation_split=0.5)
+    out = model.fit({'input_a': input_a_np, 'input_b': input_b_np},
+                    {'dense_1': output_a_np, 'dropout': output_b_np},
+                    epochs=1, batch_size=None, validation_split=0.5,
+                    steps_per_epoch=1)
+    out = model.fit({'input_a': input_a_np, 'input_b': input_b_np},
+                    {'dense_1': output_a_np, 'dropout': output_b_np},
+                    epochs=1, batch_size=None, validation_split=0.5,
+                    steps_per_epoch=1, validation_steps=1)
 
     # test validation data
     out = model.fit([input_a_np, input_b_np],
@@ -353,7 +361,7 @@ def test_model_methods():
         model.compile(optimizer, loss='mse', sample_weight_mode={'dense_1': 'temporal'})
 
     # `loss` does not exist.
-    with pytest.raises(ValueError):
+    with pytest.raises(RuntimeError):
         model.compile(optimizer, loss=[])
 
     model.compile(optimizer, loss=['mse', 'mae'])
@@ -417,7 +425,7 @@ def test_warnings():
     assert all(['Sequence' not in str(w_.message) for w_ in w]), 'A warning was raised for Sequence.'
 
 
-@pytest.mark.skipif(K.backend() != 'tensorflow', reason='sparse operations supported only by TensorFlow')
+@pytest.mark.skipif(K.backend() != 'tensorflow', reason='sparse operations supported only by TF')
 @keras_test
 def test_sparse_input_validation_split():
     test_input = sparse.random(6, 3, density=0.25).tocsr()
@@ -478,7 +486,7 @@ def test_check_bad_shape():
     assert 'targets to have the same shape' in str(exc)
 
 
-@pytest.mark.skipif(K.backend() != 'tensorflow', reason='Requires TensorFlow backend')
+@pytest.mark.skipif(K.backend() != 'tensorflow', reason='Requires TF backend')
 @keras_test
 def test_model_with_input_feed_tensor():
     """We test building a model with a TF variable as input.
@@ -575,9 +583,9 @@ def test_model_with_input_feed_tensor():
                          output_a_np, batch_size=10)
 
     # test predict
-    out = model.predict(None, steps=3)
-    out = model.predict(None, steps=3)
-    assert out.shape == (10 * 3, 4)
+    out = model.predict(None, batch_size=10)
+    out = model.predict(None, batch_size=10)
+    assert out.shape == (10, 4)
 
     # Same, without learning phase
     # i.e. we don't pass any data to fit the model.
@@ -616,9 +624,9 @@ def test_model_with_input_feed_tensor():
                          output_a_np, batch_size=10)
 
     # test predict
-    out = model.predict(None, steps=3)
-    out = model.predict(None, steps=3)
-    assert out.shape == (10 * 3, 4)
+    out = model.predict(None, batch_size=10)
+    out = model.predict(None, batch_size=10)
+    assert out.shape == (10, 4)
 
 
 @keras_test
@@ -731,75 +739,14 @@ def test_model_with_external_loss():
         out = model.predict_on_batch(None)
 
         # test fit
-        with pytest.raises(ValueError):
-            out = model.fit(None, None, epochs=1, batch_size=10)
-        out = model.fit(None, None, epochs=1, steps_per_epoch=1)
-
-        # test fit with validation data
-        with pytest.raises(ValueError):
-            out = model.fit(None, None,
-                            epochs=1,
-                            steps_per_epoch=None,
-                            validation_steps=2)
-        out = model.fit(None, None,
-                        epochs=1,
-                        steps_per_epoch=2,
-                        validation_steps=2)
+        out = model.fit(None, None, epochs=1, batch_size=None, steps_per_epoch=1)
 
         # test evaluate
-        with pytest.raises(ValueError):
-            out = model.evaluate(None, None, batch_size=10)
-        out = model.evaluate(None, None, steps=3)
+        out = model.evaluate(None, None, batch_size=10)
 
         # test predict
-        with pytest.raises(ValueError):
-            out = model.predict(None, batch_size=10)
-        out = model.predict(None, steps=3)
-        assert out.shape == (10 * 3, 4)
-
-        # Test multi-output model without external data.
-        a = Input(tensor=tf.Variable(input_a_np, dtype=tf.float32))
-        a_1 = Dense(4, name='dense_1')(a)
-        a_2 = Dropout(0.5, name='dropout')(a_1)
-        model = Model(a, [a_1, a_2])
-        model.add_loss(K.mean(a_2))
-        model.compile(optimizer='rmsprop',
-                      loss=None,
-                      metrics=['mean_squared_error'])
-
-        # test train_on_batch
-        out = model.train_on_batch(None, None)
-        out = model.test_on_batch(None, None)
-        out = model.predict_on_batch(None)
-
-        # test fit
-        with pytest.raises(ValueError):
-            out = model.fit(None, None, epochs=1, batch_size=10)
-        out = model.fit(None, None, epochs=1, steps_per_epoch=1)
-
-        # test fit with validation data
-        with pytest.raises(ValueError):
-            out = model.fit(None, None,
-                            epochs=1,
-                            steps_per_epoch=None,
-                            validation_steps=2)
-        out = model.fit(None, None,
-                        epochs=1,
-                        steps_per_epoch=2,
-                        validation_steps=2)
-
-        # test evaluate
-        with pytest.raises(ValueError):
-            out = model.evaluate(None, None, batch_size=10)
-        out = model.evaluate(None, None, steps=3)
-
-        # test predict
-        with pytest.raises(ValueError):
-            out = model.predict(None, batch_size=10)
-        out = model.predict(None, steps=3)
-        assert len(out) == 2
-        assert out[0].shape == (10 * 3, 4)
-        assert out[1].shape == (10 * 3, 4)
+        out = model.predict(None, batch_size=10)
+        assert out.shape == (10, 4)
 
 
 @keras_test
