@@ -12,7 +12,7 @@ from keras.layers.convolutional import Cropping3D
 # to flip the weights 180 deg
 # Keras needs h*w*i*o filters (where d is input, o is output), so we transpose
 
-DATA_DIR='/n/coxfs01/donglai/malis/'
+DATA_DIR='/n/coxfs01/donglai/malis_trans/'
 
 def wT(ww):#weight transformation
     ww2 = ww.transpose((2,3,4,1,0))
