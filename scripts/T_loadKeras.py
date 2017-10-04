@@ -9,8 +9,6 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import Cropping3D
 from keras.applications.affinity_unet import get_unet, load_weights
 
-DATA_DIR='/n/coxfs01/donglai/malis_trans/unet3d/'
-
 # construct model
 mn = 'malis_keras.pkl'
 # h5: need to modify code
